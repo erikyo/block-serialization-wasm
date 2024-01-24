@@ -4,7 +4,9 @@ import {useEffect} from "react";
 function App() {
 
     useEffect(() => {
-        const parsed = parse(`<!-- wp:columns {"columns":3} -->
+        const parsed = parse(`<!-- wp:image {"src":"url"} /-->
+dfgdddgd
+      <!-- wp:columns {"columns":3} -->
       <div class="wp-block-columns has-3-columns">
         <!-- wp:column -->
         <div class="wp-block-column">

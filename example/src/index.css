@@ -1,0 +1,49 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+.swatches {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 10px solid #fff;
+  box-shadow: 0 20px 60px -30px #000;
+}
+
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+input[type="color" i],
+input[type="color"]::-webkit-color-swatch-wrapper,
+input[type="color"]::-webkit-color-swatch {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+input[type="color" i] {
+  border: 6px solid #ddd;
+  border-radius: 50%;
+  overflow: hidden;
+  height: 50px;
+  width: 50px;
+}

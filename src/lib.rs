@@ -115,7 +115,6 @@ fn proceed(
                         inner_html: String::new(),
                         inner_content: Vec::new(),
                     },
-                    prev_offset: token_start + token_length,
                 });
             } else {
                 add_freeform(document, output, *offset, Some(token_start));
@@ -127,7 +126,6 @@ fn proceed(
                         inner_html: String::new(),
                         inner_content: Vec::new(),
                     },
-                    prev_offset: token_start + token_length,
                 });
             }
             *offset = token_start + token_length;

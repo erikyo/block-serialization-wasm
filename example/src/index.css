@@ -15,35 +15,23 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  max-width: 100%;
 }
 
-.swatches {
+.columns-3 {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 10px solid #fff;
-  box-shadow: 0 20px 60px -30px #000;
+  gap: 3rem;
 }
 
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  text-align: center;
+.columns-3 > div {
+  max-width: 30%;
+  padding: 2rem;
+  box-sizing: border-box;
+  max-height: 100%;
 }
 
-input[type="color" i],
-input[type="color"]::-webkit-color-swatch-wrapper,
-input[type="color"]::-webkit-color-swatch {
-  width: 100%;
-  padding: 0;
-  margin: 0;
-  border: 0;
-}
-
-input[type="color" i] {
-  border: 6px solid #ddd;
-  border-radius: 50%;
-  overflow: hidden;
-  height: 50px;
-  width: 50px;
+.columns-3 > div code {
+  font-family: monospace;
+  background: #f3f3f3;
+  overflow: auto;
 }

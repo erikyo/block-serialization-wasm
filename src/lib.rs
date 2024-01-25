@@ -19,8 +19,7 @@ struct Block {
 
 #[derive(Debug)]
 struct Frame {
-    block: Block,
-    prev_offset: usize,
+    block: Block
 }
 
 // Freeform and inner block helpers
@@ -70,31 +69,16 @@ fn proceed(
             }
             None
         }
-        "closer" => {
-            let opening_tag = stack.pop()?;
-            find_start_tag(&document, token_start - opening_tag.len()).unwrap_or(0);
-
-            // Add the inner block
-            add_inner_block(
-                &document,
-                output,
-                opening_tag_start,
-                token_start + block_name.len(),
-                opening_tag,
-                &attrs,
-            );
-            *offset = token_start + block_name.len()
-            None
-        }
         "void-block" => {
             if stack_len > 0 {
                 add_inner_block(
                     document,
                     output,
-                    token_start,
+                    s.unwrap(),
                     token_length,
                     block_name.clone(),
                     &attrs,
+                    stack
                 );
                 *offset = token_start + token_length;
             } else {
@@ -117,10 +101,11 @@ fn proceed(
                 add_inner_block(
                     document,
                     output,
-                    token_start,
+                    s.unwrap(),
                     token_length,
                     block_name.clone(),
                     &attrs,
+                    stack
                 );
                 stack.push(Frame {
                     block: Block {
@@ -151,16 +136,17 @@ fn proceed(
         "block-closer" => {
             if stack_len > 0 {
                 let mut stack_top = stack.pop().unwrap();
-                let html = &document[stack_top.prev_offset..token_start];
+                let html = &document[token_start..token_start +token_length];
                 stack_top.block.inner_html.push_str(html);
                 stack_top.block.inner_content.push(html.to_string());
                 add_inner_block(
                     document,
                     output,
-                    token_start,
+                    s.unwrap(),
                     token_length,
                     block_name.clone(),
                     &attrs, // pass as reference to attrs
+                    stack
                 );
                 output.push(stack_top.block);
                 *offset = token_start + token_length;
@@ -193,9 +179,7 @@ fn next_token(document: &str, tokenizer: &Regex, last_offset: usize) -> (String,
 
         let block_name = format!("{}{}", namespace, name);
 
-        if (block_name.starts_with('/') {
-            return ("closer".to_string(), block_name, parse_json(attrs), token_start, token_length);
-        } else if is_self_closing {
+        if is_self_closing {
             return ("void-block".to_string(), block_name, parse_json(attrs), token_start, token_length);
         } else if is_closing {
             return ("block-closer".to_string(), block_name, parse_json(attrs), token_start, token_length);
@@ -207,17 +191,6 @@ fn next_token(document: &str, tokenizer: &Regex, last_offset: usize) -> (String,
     }
 }
 
-fn find_start_tag(document: &str, mut position: usize) -> Option<usize> {
-    while position > 0 {
-        position -= 1;
-        let c = document.chars().nth(position)?;
-        if c == '<' {
-            return Some(position);
-        }
-    }
-    None
-}
-
 fn parse_json(json_str: &str) -> HashMap<String, Value> {
     match serde_json::from_str(json_str) {
         Ok(val) => match val {
@@ -226,7 +199,9 @@ fn parse_json(json_str: &str) -> HashMap<String, Value> {
         },
         Err(_) => HashMap::new(),
     }
-}fn add_freeform(document: &str, output: &mut Vec<Block>, offset: usize, raw_length: Option<usize>) {
+}
+
+fn add_freeform(document: &str, output: &mut Vec<Block>, offset: usize, raw_length: Option<usize>) {
     // Check if the offset is within bounds
     if offset > document.len() {
         // Handle the error or log it as needed
@@ -254,7 +229,7 @@ fn parse_json(json_str: &str) -> HashMap<String, Value> {
     println!("Content: {:?}", &document[offset..end_index]);
 }
 
-// Inner block helpers
+
 fn add_inner_block(
     document: &str,
     output: &mut Vec<Block>,
@@ -262,6 +237,7 @@ fn add_inner_block(
     token_length: usize,
     block_name: String,
     attrs: &HashMap<String, Value>,
+    stack: &mut Vec<Frame>,
 ) {
     // Ensure that token_start and token_length are within bounds
     if token_start < document.len() && token_start + token_length <= document.len() {
@@ -270,9 +246,12 @@ fn add_inner_block(
         let mut inner_blocks = Vec::new();
         let inner_document = &document[token_start + token_length..];
 
+        // Debug prints
+        println!("Inner Document: {:?}", inner_document);
+
         // Recursively parse inner blocks
         let mut inner_offset = 0;
-        while let Some(_) = proceed(inner_document, &mut inner_offset, &mut inner_blocks, &mut vec![]) {}
+        while let Some(_) = proceed(inner_document, &mut inner_offset, &mut inner_blocks, stack) {}
 
         let block = Block {
             block_name: Some(block_name.clone()),
@@ -283,13 +262,13 @@ fn add_inner_block(
         };
 
         // Debug prints
-        println!("Adding inner block: {:?}", block_name);
-        println!("Token start: {}, Token length: {}", token_start, token_length);
-        println!("HTML: {:?}", html);
+        eprintln!("Adding inner block: {:?}", block_name);
+        eprintln!("Token start: {}, Token length: {}", token_start, token_length);
+        eprintln!("HTML: {:?}", html);
 
         output.push(block);
     } else {
-        // Handle the error or log it as needed
+        // Debug prints
         eprintln!("Error: Token position out of bounds");
         eprintln!("Token start: {}, Token length: {}", token_start, token_length);
         eprintln!("Document length: {}", document.len());

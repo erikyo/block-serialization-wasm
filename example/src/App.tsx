@@ -4,14 +4,14 @@ import {useEffect} from "react";
 function App() {
 
     useEffect(() => {
-        const parsed = parse(`<!-- wp:image {"src":"url"} /-->
-dfgdddgd
+        const parsed = parse(`
       <!-- wp:columns {"columns":3} -->
       <div class="wp-block-columns has-3-columns">
         <!-- wp:column -->
         <div class="wp-block-column">
           <!-- wp:paragraph -->
           <p>Left</p>
+          <!-- wp:image {"src":"url"} /-->
           <!-- /wp:paragraph -->
         </div>
         <!-- /wp:column -->
@@ -29,7 +29,7 @@ dfgdddgd
         <!-- /wp:column -->
       </div>
       <!-- /wp:columns -->` as string)
-        console.log(parsed)
+        console.table(parsed)
         const dest = document.getElementById('output')
         if (dest) dest.innerHTML = JSON.stringify(parsed)
     })

@@ -59,7 +59,7 @@ fn proceed(
     let token = next_token(&document, &tokenizer, *offset);
 
     let (token_type, block_name, attrs, token_start, token_length) = token;
-    let s = if token_start > *offset { Some(*offset) } else { None };
+    let size = if token_start > *offset { Some(*offset) } else { None };
 
     match token_type.as_ref() {
         "no-more-tokens" => {
@@ -74,7 +74,7 @@ fn proceed(
                 add_inner_block(
                     document,
                     output,
-                    s.unwrap(),
+                    size.unwrap(),
                     token_length,
                     block_name.clone(),
                     &attrs,
@@ -82,7 +82,7 @@ fn proceed(
                 );
                 *offset = token_start + token_length;
             } else {
-                if let Some(s) = s {
+                if let Some(s) = size {
                     add_freeform(document, output, s, Some(token_start));
                 }
                 output.push(Block {
@@ -101,21 +101,12 @@ fn proceed(
                 add_inner_block(
                     document,
                     output,
-                    s.unwrap(),
+                    size.unwrap(),
                     token_length,
                     block_name.clone(),
                     &attrs,
                     stack
                 );
-                stack.push(Frame {
-                    block: Block {
-                        block_name: Some(block_name),
-                        attrs: attrs.clone(),
-                        inner_blocks: Vec::new(),
-                        inner_html: String::new(),
-                        inner_content: Vec::new(),
-                    },
-                });
             } else {
                 add_freeform(document, output, *offset, Some(token_start));
                 stack.push(Frame {
@@ -140,7 +131,7 @@ fn proceed(
                 add_inner_block(
                     document,
                     output,
-                    s.unwrap(),
+                    size.unwrap(),
                     token_length,
                     block_name.clone(),
                     &attrs, // pass as reference to attrs
@@ -157,6 +148,7 @@ fn proceed(
         }
         _ => {
             add_freeform(document, output, *offset, Some(token_start));
+            *offset = token_start + token_length;
             None
         }
     }
@@ -242,7 +234,7 @@ fn add_inner_block(
         let html = &document[token_start..token_start + token_length];
 
         let mut inner_blocks = Vec::new();
-        let inner_document = &document[token_start + token_length..];
+        let inner_document = &document[token_start + token_length..]; // TODO: Fix here
 
         // Debug prints
         println!("Inner Document: {:?}", inner_document);

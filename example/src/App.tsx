@@ -46,6 +46,8 @@ function App() {
         const destWasm = document.getElementById('output-wasm')?.querySelector('code')
         if (destWasm) destWasm.innerHTML = JSON.stringify( parsedWasm, null, 2)
         console.table(parsedWasm)
+
+        console.log("---")
     }, [])
 
     return null

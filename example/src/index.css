@@ -13,7 +13,7 @@ body {
   margin: 0;
   display: flex;
   place-items: center;
-  min-width: 320px;
+  min-width: 1000px;
   min-height: 100vh;
   max-width: 100%;
 }
@@ -21,10 +21,15 @@ body {
 .columns-3 {
   display: flex;
   gap: 3rem;
+  margin: auto;
+  width: 80%;
 }
 
 .columns-3 > div {
   max-width: 30%;
+  min-width: 30%;
+  background: #f3f3f3;
+  border-radius: 1rem;
   padding: 2rem;
   box-sizing: border-box;
   max-height: 100%;
@@ -32,6 +37,5 @@ body {
 
 .columns-3 > div code {
   font-family: monospace;
-  background: #f3f3f3;
   overflow: auto;
 }
